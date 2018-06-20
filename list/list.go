@@ -19,12 +19,12 @@ type node struct {
 	val  int
 }
 
-func New() List {
+func New() *List {
 	head := &node{}
 	tail := &node{}
 	head.next = tail
 	tail.prev = head
-	return List{head: head, tail: tail, iterator: head}
+	return &List{head: head, tail: tail, iterator: head}
 }
 
 func (list *List) Insert(pos int, val int) error {
@@ -69,20 +69,26 @@ func (list *List) PushFront(arr ...int) error {
 	return nil
 }
 
-func (list *List) Append(arr ...int) error {
-	for _, val := range arr {
-		err := list.Insert(list.len, val)
-		if err != nil {
-			return err
-		}
+func (list *List) Append(val int) error {
+	if list.len == 0 {
+		return list.Insert(0, val)
 	}
+
+	node := &node{val: val}
+
+	lastNode := list.tail.prev
+	lastNode.next = node
+	node.prev = lastNode
+	node.next = list.tail
+	list.tail.prev = node
+	list.len++
 
 	return nil
 }
 
 func (list *List) Erase(pos int) (int, error) {
 	if pos < 0 || pos >= list.len {
-		return 0, errors.New(fmt.Sprintf("cannot remove element in the list of %v elements to position [%v]", list.len, pos))
+		return 0, errors.New(fmt.Sprintf("cannot remove element in the list of %v elements in position [%v]", list.len, pos))
 	}
 
 	posNode, err := list.getNode(pos)
@@ -90,24 +96,36 @@ func (list *List) Erase(pos int) (int, error) {
 		return 0, err
 	}
 
-	oldVal := posNode.val
-	leftNode := posNode.prev
-	rightNode := posNode.next
+	return list.eraseNode(posNode), nil
+}
+
+func (list *List) eraseNode(node *node) int {
+	oldVal := node.val
+	leftNode := node.prev
+	rightNode := node.next
 	leftNode.next = rightNode
 	rightNode.prev = leftNode
-	posNode.next = nil
-	posNode.prev = nil
+	node.next = nil
+	node.prev = nil
 	list.len--
 
-	return oldVal, nil
+	return oldVal
 }
 
 func (list *List) PopFront() (int, error) {
-	return list.Erase(0)
+	if list.len == 0 {
+		return 0, errors.New("list is empty")
+	}
+
+	return list.eraseNode(list.head.next), nil
 }
 
 func (list *List) PopBack() (int, error) {
-	return list.Erase(list.len - 1)
+	if list.len == 0 {
+		return 0, errors.New("list is empty")
+	}
+
+	return list.eraseNode(list.tail.prev), nil
 }
 
 func (list *List) Find(goal int) (*node, bool) {
