@@ -10,3 +10,4 @@ Also all of the data structures here are not generic 🤷‍♂️ (there are st
 - [List](https://github.com/artemmnad/go-learning-data-structures/tree/master/list) (doubly linked)
 - [Stack](https://github.com/artemmnad/go-learning-data-structures/tree/master/stack) (slices)
 - [Stackl](https://github.com/artemmnad/go-learning-data-structures/tree/master/stack) (linked list)
+- [Pqueue](https://github.com/artemmnad/go-learning-data-structures/tree/master/stack) (priority queue)
